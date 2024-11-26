@@ -41,6 +41,17 @@ x-airflow-common:
     - airbyte_internal
 
 services:
+  docker-proxy:
+      image: alpine/socat
+      command: -t 900 TCP-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock
+      ports:
+        - "2375"
+      user: root
+      volumes:
+        - ${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock
+      networks:
+        - airbyte_internal
+
   init:
     image: airbyte/init:${VERSION}
     logging: *default-logging
